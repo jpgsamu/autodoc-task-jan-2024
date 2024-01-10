@@ -48,10 +48,32 @@ FROM data_set_da_test
 GROUP BY 1, 2
 ORDER BY 1, 3 DESC
 
--- NOTE:
--- (1) "order_page": only triggers the "order" event
--- (2) "listing_page" (PLP): triggers "page_view" and "add_to_cart"
--- (3) "search_listing_page" (search PLP): triggers "page_view" and "add_to_cart"
--- (4) "product_page" (search PLP): triggers "page_view" and "add_to_cart"
--- !!!!!! "add_to_cart" is greater on search PLP vs. PLP - maybe ranking algorithm and/or visual merchandise can be optimized? need to check CTRs
+-- NOTE
+/*
+(1) "order_page": only triggers the "order" event
+(2) "listing_page" (PLP): triggers "page_view" and "add_to_cart"
+(3) "search_listing_page" (search PLP): triggers "page_view" and "add_to_cart"
+(4) "product_page" (search PLP): triggers "page_view" and "add_to_cart"
+!!!!!! "add_to_cart" is greater on search PLP vs. PLP - maybe ranking algorithm and/or visual merchandise can be optimized? need to check CTRs
+*/
+------------------------------------------------------------------------------------------
+-- Do we always have "user"? Is it potentially null for "guest sessions"?
+SELECT CASE WHEN user IS NULL THEN 1 ELSE 0 END as null_user_flag
+     , SUM(1) as records
+ 
+FROM data_set_da_test
+
+GROUP BY 1
+ORDER BY 2 DESC
+-- NOTE: We always have user filled.event_date
+------------------------------------------------------------------------------------------
+-- Running the same test for session
+SELECT CASE WHEN session IS NULL THEN 1 ELSE 0 END as null_session_flag
+     , SUM(1) as records
+ 
+FROM data_set_da_test
+
+GROUP BY 1
+ORDER BY 2 DESC
+-- NOTE: We always have user filled.
 ------------------------------------------------------------------------------------------
