@@ -73,6 +73,8 @@ FROM data_set_da_test)
 SELECT  main.*
       , sup_land.page_type as landing_page
       , sup_exit.page_type as exit_page
+      , ROUND((JULIANDAY(next_session_start) - JULIANDAY(session_start))) as days_from_last_session
+      , ROUND((JULIANDAY(session_start) - JULIANDAY(last_session_start))) as days_to_next_session
 
 FROM windowed_session_info main
 LEFT JOIN exit_land_support sup_land ON main.session_id = sup_land.session_id AND sup_land.rown_asc = 1
