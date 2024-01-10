@@ -1,3 +1,5 @@
+CREATE TABLE tb_products as 
+
 with product_sessions as (
 SELECT     
           -- Number of add to carts per session and product
@@ -18,7 +20,7 @@ GROUP BY 1,2)
 
 , previous_pages as (
 SELECT
-
+         -- Captures the pageviews seen before an "add_to_cart" event
           ps.product_id
         , ps.session_id
         , ps.a2b_qty
@@ -34,22 +36,16 @@ SELECT
 FROM product_sessions ps
 LEFT JOIN data_set_da_test main ON main.session = ps.session_id
                                  AND main.event_date <= ps.first_a2b_timestamp
-
-WHERE event_type = "page_view"
+                                 AND main.event_type = "page_view"
 
 GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
-
-select count(*) from previous_pages
-
 --
-SELECT * FROM previous_pages
 
-/*
-SELECT product_sessions.*
+SELECT pp.*
      , tb_sessions.has_event_order as session_has_order
 
 
-FROM product_sessions
-JOIN tb_sessions ON product_sessions.session_id = tb_sessions.session_id
-*/
+FROM previous_pages pp 
+JOIN tb_sessions ON pp.session_id = tb_sessions.session_id
+;
