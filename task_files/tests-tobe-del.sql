@@ -1,2 +1,4 @@
 SELECT * 
-FROM tb_products
+FROM tb_sessions
+
+LIMIT 1
