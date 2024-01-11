@@ -35,17 +35,40 @@ SELECT
 
 FROM product_sessions ps
 LEFT JOIN data_set_da_test main ON main.session = ps.session_id
-                                 AND main.event_date <= ps.first_a2b_timestamp
-                                 AND main.event_type = "page_view"
+                                AND main.event_date <= ps.first_a2b_timestamp
+                                AND main.event_type = "page_view"
 
 GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
 --
 
+, final_sessions_products as (
 SELECT pp.*
      , tb_sessions.has_event_order as session_has_order
 
-
 FROM previous_pages pp 
-JOIN tb_sessions ON pp.session_id = tb_sessions.session_id
+JOIN tb_sessions ON pp.session_id = tb_sessions.session_id)
+--
+
+SELECT    
+          -- Final Product ID dataset
+          product_id
+
+        , SUM(1) as sessions_a2b_qty
+        , SUM(session_has_order) as sessions_with_order
+
+        , SUM(a2b_qty) as events_a2b_qty
+        , SUM(pdp_a2b_qty) as events_pdp_a2b_qty
+        , SUM(plp_a2b_qty) as events_plp_a2b_qty
+        , SUM(search_plp_a2b_qty) as events_search_plp_a2b_qty
+
+        , SUM(page_qty_before_a2b) as pages_before_a2b_qty
+        , SUM(pdp_qty_before_a2b) as pdp_before_a2b_qty
+        , SUM(plp_qty_before_a2b) as plp_before_a2b_qty
+        , SUM(search_plp_qty_before_a2b) as search_plp_before_a2b_qty
+        
+FROM final_sessions_products
+
+GROUP BY 1
+ORDER BY 2 DESC
 ;
