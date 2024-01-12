@@ -27,8 +27,6 @@ SELECT session_date
      , SUM(CASE WHEN has_event_add_to_cart = 1 AND
                      has_event_order = 1 THEN 1 ELSE 0 END) as sessions_with_a2b_and_order
 
-
-
 FROM tb_sessions
 
 GROUP BY 1, 2, 3
