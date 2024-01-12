@@ -34,6 +34,7 @@ FROM tb_sessions
 
 GROUP BY 1,2)
 --
+, tb_combined as (
 SELECT  tb_main.date_ref
       , tb_main.page_type
       , tb_main.session_qty
@@ -52,5 +53,26 @@ FROM tb_main
 LEFT JOIN tb_LP ON tb_main.date_ref = tb_LP.date_ref AND tb_main.page_type = tb_LP.page_type
 LEFT JOIN tb_EP ON tb_main.date_ref = tb_EP.date_ref AND tb_main.page_type = tb_EP.page_type
 
-ORDER BY 1, 2
+ORDER BY 1, 2)
+--
+, tb_agg as (
+SELECT date_ref
+     , SUM(session_qty) as session_qty_total
+     , SUM(pageview_event_qty) as pageview_event_qty_total
+     , SUM(atc_event_qty) as atc_event_qty_total
+     , SUM(landing_session_qty) as landing_session_qty_total
+
+FROM tb_combined
+
+GROUP BY 1)
+--
+
+SELECT tb_combined.*
+     , tb_agg.session_qty_total
+     , tb_agg.pageview_event_qty_total
+     , tb_agg.atc_event_qty_total
+     , tb_agg.landing_session_qty_total
+
+FROM tb_combined
+LEFT JOIN tb_agg ON tb_combined.date_ref = tb_agg.date_ref
 ;
