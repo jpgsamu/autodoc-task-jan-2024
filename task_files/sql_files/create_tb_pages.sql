@@ -5,6 +5,7 @@ SELECT session_date
      , page_type
      , COUNT(DISTINCT session) as session_qty
      , COUNT(DISTINCT CASE WHEN aux.has_event_order = 1 THEN session ELSE NULL END) as session_converted_qty
+     , COUNT(DISTINCT CASE WHEN aux.has_event_order = 1 THEN session ELSE NULL END) as session_atc_qty
      , SUM(CASE WHEN event_type = "page_view" THEN 1 ELSE 0 END) as pageview_event_qty
      , SUM(CASE WHEN event_type = "add_to_cart" THEN 1 ELSE 0 END) as atc_event_qty
      
@@ -39,6 +40,7 @@ SELECT  tb_main.session_date
       , tb_main.page_type
       , tb_main.session_qty
       , tb_main.session_converted_qty
+      , tb_main.session_atc_qty
       , tb_main.pageview_event_qty
       , tb_main.atc_event_qty
 
