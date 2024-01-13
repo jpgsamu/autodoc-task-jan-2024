@@ -55,9 +55,7 @@ INNER JOIN tb_sessions_rn aux ON main.user_id = aux.user_id AND aux.session_numb
 SELECT  user_id
       , session_id
 
-      , session_number as session_qty
       , days_in_base
-
       , session_number as session_qty_acc
       , SUM(add_to_cart_qty) OVER (PARTITION BY user_id ORDER BY session_start) as add_to_cart_qty_acc
 

@@ -1,0 +1,4 @@
+SELECT *
+
+FROM tb_Funnel_1
+LIMIT 5
