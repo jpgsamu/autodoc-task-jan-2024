@@ -16,7 +16,7 @@ Here's my list of tests:
 * tracking_issue_5 (ti5) -> Sessions that have "search_listing_page" events but no "page_view" event: Another potential hint of missing "page_view" events.
 * tracking_issue_6 (ti6) -> Sessions that have "order_page" events but no "page_view" event: Another potential hint of missing "page_view" events.
 
-* tracking_issue_7 (ti7) -> Users that have no "add_to_cart" events in between orders. Potential traking issues on "add_to_cart" events.ABORT
+* tracking_issue_7 (ti7) -> Users that have no "add_to_cart" events in between orders. Potential traking issues on "add_to_cart" events.
 
 -----------------------------------
 # Potential Bot and Fraud Behaviour
@@ -29,7 +29,7 @@ Here's my list of tests:
 # Potential Website Malfunction
 -----------------------------------
 * bounce_rate -> Sessions that only have 1 event. If the rate is high, users might be facing website malfunctions and exiting rapidly.
-* avg_session_duration -> Sessions average duration, supports bounce_rate in identifying potential malfunctions.
+* avg_session_duration_sec -> Sessions average duration in seconds, supports bounce_rate in identifying potential malfunctions.
 
 */
 
@@ -60,6 +60,9 @@ SELECT  user as user_id
 
       , MAX(CASE WHEN page_type = "search_listing_page" AND event_type = "page_view" THEN 1 ELSE 0 END) as has_search_view
       , MAX(CASE WHEN page_type = "search_listing_page" AND event_type <> "page_view" THEN 1 ELSE 0 END) as has_search_action
+
+      , MAX(CASE WHEN page_type = "order_page" AND event_type = "page_view" THEN 1 ELSE 0 END) as has_order_view
+      , MAX(CASE WHEN page_type = "order_page" AND event_type <> "page_view" THEN 1 ELSE 0 END) as has_order_action  
 
 FROM data_set_da_test 
 
@@ -166,3 +169,46 @@ SELECT  main.*
 FROM tb_atc_and_orders main
 LEFT JOIN tb_atc_and_orders_aux aux ON main.event_id = aux.event_id)
 --
+
+, tb_no_atc_in_between_orders as (
+SELECT  DATE(event_date) as date_ref
+      , SUM(1) as ti7 -- Users that have no "add_to_cart" events in between orders
+
+FROM tb_atc_and_orders_final
+
+WHERE atc_and_order_type = "Unusual Order"
+
+GROUP BY 1)
+--
+
+, tb_multiple_session_tests as (
+SELECT  session_start_date as date_ref
+
+      , SUM(CASE WHEN has_event_page_view = 0 THEN 1 ELSE 0 END) as ti1 -- Sessions that don't have "page_view" event
+
+      , SUM(case WHEN tb_numbered_session_events.session_id IS NOT NULL THEN 1 ELSE 0 END) as ti2 -- Sessions in which "page_view" is not the first event
+
+      , SUM(CASE WHEN has_pdp_view = 0 AND has_pdp_action = 1 THEN 1 ELSE 0 END) as ti3 -- Sessions that have "product_page" events but no "page_view" event
+      , SUM(CASE WHEN has_plp_view = 0 AND has_plp_action = 1 THEN 1 ELSE 0 END) as ti4 -- Sessions that have "listing_page" events but no "page_view" event
+      , SUM(CASE WHEN has_search_view = 0 AND has_search_action = 1 THEN 1 ELSE 0 END) as ti5 -- Sessions that have "search_listing_page" events but no "page_view" event
+      , SUM(CASE WHEN has_order_view = 0 AND has_order_action = 1 THEN 1 ELSE 0 END) as ti6 -- Sessions that have "order_page" events but no "page_view" event
+
+      , SUM(CASE WHEN qty_event_any = 1 THEN 1 ELSE 0 END) / SUM(1) as bounce_rate
+      , AVG(session_duration_secs) as avg_session_duration_secs
+
+FROM tb_sessions_agg
+LEFT JOIN tb_numbered_session_events ON tb_sessions_agg.session_id = tb_numbered_session_events.session_id
+          AND tb_numbered_session_events.rown = 1
+          AND tb_numbered_session_events.event_type <> "page_view"
+
+GROUP BY 1)
+--
+, tb_multiple_users_tests as (
+SELECT  event_date as as date_ref
+      , SUM(CASE WHEN session_qty >= 10 THEN 1 ELSE 0 END) as su1
+FROM tb_users_daily
+
+GROUP BY 1
+
+
+)
