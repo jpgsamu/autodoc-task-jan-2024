@@ -10,7 +10,6 @@ FROM tb_sessions
 
 WHERE has_event_order = 1
 GROUP BY 1)
-
 --
 
 SELECT 
