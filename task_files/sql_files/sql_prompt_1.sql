@@ -1,4 +1,5 @@
 /* 
+
 PROMPT 1: Write an SQL query that will return a number of clients by day that:
 
 (1) only viewed products in their first session;
@@ -186,7 +187,7 @@ SELECT  tb_question1_lifecycle.date_ref
       , users_only_1_atc_event_on_day_qty 
       , users_only_1_product_id_atc_on_day_qty
 
-         -- Question 3
+      -- Question 3
       , user_has_order_within_48h_after_1st_session_lifecycle_qty
       , user_has_order_within_48h_after_1st_session_daily_qty
       
