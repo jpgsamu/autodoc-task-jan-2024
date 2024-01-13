@@ -21,14 +21,14 @@ Here's my list of tests:
 -----------------------------------
 # Potential Bot and Fraud Behaviour
 -----------------------------------
-* suspicious_users_1 (su1) -> Users that have "+10" sessions on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be price_checker bots.
-* suspicious_users_2 (su2) -> Users that have "+100" page_view events on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be price_checker bots.
-* suspicious_users_3 (su3) -> Users that have "+10" order events on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be fraud.
+* suspicious_users_1 (su1) -> Users that have "+5" sessions on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be price_checker bots.
+* suspicious_users_2 (su2) -> Users that have "+50" page_view events on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be price_checker bots.
+* suspicious_users_3 (su3) -> Users that have "+5" order events on a given day. Arbitrary threshold that may be refined on future studies with the distribution. Might be fraud.
 
 -----------------------------------
 # Potential Website Malfunction
 -----------------------------------
-* bounce_rate -> Sessions that only have 1 event. If the rate is high, users might be facing website malfunctions and exiting rapidly.
+* perc_bounce_rate -> Sessions that only have 1 event. If the rate is high, users might be facing website malfunctions and exiting rapidly.
 * avg_session_duration_sec -> Sessions average duration in seconds, supports bounce_rate in identifying potential malfunctions.
 
 */
@@ -75,7 +75,7 @@ SELECT  user as user_id
 
       , COUNT(DISTINCT session) as session_qty
       , SUM(CASE WHEN event_type = "page_view" THEN 1 ELSE 0 END) as pageview_qty
-      , SUM(CASE WHEN event_type = "page_view" THEN 1 ELSE 0 END) as order_qty
+      , SUM(CASE WHEN event_type = "order" THEN 1 ELSE 0 END) as order_qty
 
 FROM data_set_da_test 
 
@@ -193,8 +193,8 @@ SELECT  session_start_date as date_ref
       , SUM(CASE WHEN has_search_view = 0 AND has_search_action = 1 THEN 1 ELSE 0 END) as ti5 -- Sessions that have "search_listing_page" events but no "page_view" event
       , SUM(CASE WHEN has_order_view = 0 AND has_order_action = 1 THEN 1 ELSE 0 END) as ti6 -- Sessions that have "order_page" events but no "page_view" event
 
-      , SUM(CASE WHEN qty_event_any = 1 THEN 1 ELSE 0 END) / SUM(1) as bounce_rate
-      , AVG(session_duration_secs) as avg_session_duration_secs
+      , ROUND(100 * SUM(CASE WHEN qty_event_any = 1 THEN 1 ELSE 0 END) / SUM(1),0) as perc_bounce_rate -- * 100 since SQLITE doesnt support floating points
+      , ROUND(AVG(session_duration_secs),0) as avg_session_duration_secs
 
 FROM tb_sessions_agg
 LEFT JOIN tb_numbered_session_events ON tb_sessions_agg.session_id = tb_numbered_session_events.session_id
@@ -204,11 +204,38 @@ LEFT JOIN tb_numbered_session_events ON tb_sessions_agg.session_id = tb_numbered
 GROUP BY 1)
 --
 , tb_multiple_users_tests as (
-SELECT  event_date as as date_ref
-      , SUM(CASE WHEN session_qty >= 10 THEN 1 ELSE 0 END) as su1
+SELECT  event_date as date_ref
+      , SUM(CASE WHEN session_qty >= 5 THEN 1 ELSE 0 END) as su1
+      , SUM(CASE WHEN pageview_qty >= 50 THEN 1 ELSE 0 END) as su2
+      , SUM(CASE WHEN order_qty >= 5 THEN 1 ELSE 0 END) as su3
+
 FROM tb_users_daily
 
+GROUP BY 1)
+--
+SELECT  tb_multiple_session_tests.date_ref
+
+       -- Potential Tracking Issues
+      , tb_multiple_session_tests.ti1
+      , tb_multiple_session_tests.ti2
+      , tb_multiple_session_tests.ti3
+      , tb_multiple_session_tests.ti4
+      , tb_multiple_session_tests.ti5
+      , tb_multiple_session_tests.ti6
+      , tb_no_atc_in_between_orders.ti7
+
+      -- Potential Bot and Fraud Behaviour
+      , tb_multiple_users_tests.su1
+      , tb_multiple_users_tests.su2
+      , tb_multiple_users_tests.su3
+
+        -- Potential Website Malfunction
+      , tb_multiple_session_tests.perc_bounce_rate
+      , tb_multiple_session_tests.avg_session_duration_secs
+
+FROM tb_multiple_session_tests
+LEFT JOIN tb_no_atc_in_between_orders ON tb_multiple_session_tests.date_ref = tb_no_atc_in_between_orders.date_ref
+LEFT JOIN tb_multiple_users_tests ON tb_multiple_session_tests.date_ref = tb_multiple_users_tests.date_ref
+
 GROUP BY 1
-
-
-)
+ORDER BY 1
