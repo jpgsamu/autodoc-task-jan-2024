@@ -154,6 +154,7 @@ FROM tb_days_until_order_daily
 GROUP BY 1
 ORDER BY 1)
 --
+
 , tb_users_daily as ( -- This subquery will aggregate user metrics per user_id daily
 SELECT  user as user_id
       , DATE(event_date) as event_date
@@ -189,8 +190,6 @@ SELECT  tb_question1_lifecycle.date_ref
       , user_has_order_within_48h_after_1st_session_lifecycle_qty
       , user_has_order_within_48h_after_1st_session_daily_qty
       
-
-
 FROM tb_question1_lifecycle
 LEFT JOIN tb_question1_daily ON tb_question1_lifecycle.date_ref = tb_question1_daily.date_ref
 
