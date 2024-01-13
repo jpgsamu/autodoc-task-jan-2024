@@ -216,22 +216,22 @@ GROUP BY 1)
 SELECT  tb_multiple_session_tests.date_ref
 
        -- Potential Tracking Issues
-      , tb_multiple_session_tests.ti1
-      , tb_multiple_session_tests.ti2
-      , tb_multiple_session_tests.ti3
-      , tb_multiple_session_tests.ti4
-      , tb_multiple_session_tests.ti5
-      , tb_multiple_session_tests.ti6
-      , tb_no_atc_in_between_orders.ti7
+      , tb_multiple_session_tests.ti1 -- Sessions that don't have "page_view" event
+      , tb_multiple_session_tests.ti2 -- Sessions in which "page_view" is not the first event
+      , tb_multiple_session_tests.ti3 -- Sessions that have "product_page" events but no "page_view" event
+      , tb_multiple_session_tests.ti4 -- Sessions that have "listing_page" events but no "page_view" event
+      , tb_multiple_session_tests.ti5 -- Sessions that have "search_listing_page" events but no "page_view"
+      , tb_multiple_session_tests.ti6 -- Sessions that have "order_page" events but no "page_view" event
+      , tb_no_atc_in_between_orders.ti7 -- Users that have no "add_to_cart" events in between orders
 
       -- Potential Bot and Fraud Behaviour
-      , tb_multiple_users_tests.su1
-      , tb_multiple_users_tests.su2
-      , tb_multiple_users_tests.su3
+      , tb_multiple_users_tests.su1 -- Users that have "+5" sessions on a given day
+      , tb_multiple_users_tests.su2 -- Users that have "+50" page_view events on a given day
+      , tb_multiple_users_tests.su3 -- Users that have "+5" order events on a given day
 
         -- Potential Website Malfunction
-      , tb_multiple_session_tests.perc_bounce_rate
-      , tb_multiple_session_tests.avg_session_duration_secs
+      , tb_multiple_session_tests.perc_bounce_rate -- % Sessions that only have 1 record
+      , tb_multiple_session_tests.avg_session_duration_secs -- Sessions average duration in seconds
 
 FROM tb_multiple_session_tests
 LEFT JOIN tb_no_atc_in_between_orders ON tb_multiple_session_tests.date_ref = tb_no_atc_in_between_orders.date_ref
