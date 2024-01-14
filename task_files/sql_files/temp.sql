@@ -1,4 +1,0 @@
-SELECT *
-
-FROM tb_pages
-LIMIT 5
