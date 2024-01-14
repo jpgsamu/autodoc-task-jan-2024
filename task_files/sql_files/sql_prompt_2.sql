@@ -16,7 +16,7 @@ Here's my list of tests:
 * tracking_issue_5 (ti5) -> Sessions that have "search_listing_page" events but no "page_view" event: Another potential hint of missing "page_view" events.
 * tracking_issue_6 (ti6) -> Sessions that have "order_page" events but no "page_view" event: Another potential hint of missing "page_view" events.
 
-* tracking_issue_7 (ti7) -> Users that have no "add_to_cart" events in between orders. Potential traking issues on "add_to_cart" events.
+* tracking_issue_7 (ti7) -> Users that have no "add_to_cart" events in between orders. Potential tracking issues on "add_to_cart" events.
 
 -----------------------------------
 # Potential Bot and Fraud Behaviour

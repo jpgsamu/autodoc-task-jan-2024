@@ -1,4 +1,4 @@
 SELECT *
 
-FROM tb_Funnel_1
+FROM tb_pages
 LIMIT 5

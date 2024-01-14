@@ -25,12 +25,12 @@ PROMPT 1: Write an SQL query that will return a number of clients by day that:
 -> Outcome description:
 
 * users_only_view_products_on_1st_session_lifecycle_qty - Qty of users that only view produts on their first session ever in the entire dataset (lifecycle), rooted on the first session date.
-* users_only_view_products_on_1st_session_daily_qty - Qty of users that only view produts on their first session ever of a given day, rooted on that given day.
+* users_only_view_products_on_1st_session_daily_qty - Qty of users that only view products on their first session of a given day, rooted on that given day.
 
 * users_only_1_atc_event_on_day_qty - Qty of users that only have 1 ATC event daily, rooted on the event date.
 * users_only_1_product_id_atc_on_day_qty - Qty of users that only have 1 "product_id" added to cart daily (1 or more times), rooted on the event date.
 
-* user_has_order_within_48h_after_1st_session_lifecycle_qty - Qty of users that place an orden within 48h after their first ever session in the entire dataset (lifecycle), rooted on the first session date.
+* user_has_order_within_48h_after_1st_session_lifecycle_qty - Qty of users that place an order within 48h after their first ever session in the entire dataset (lifecycle), rooted on the first session date.
 * user_has_order_within_48h_after_1st_session_daily_qty - Qty of users that place an order within 48h of after their first sesssion on a given day, rooted on that given day.
 
 */
